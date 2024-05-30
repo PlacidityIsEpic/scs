@@ -83,13 +83,26 @@
         // Set initial mode
         codeMirrorEditor.setOption('mode', 'lua');
 
-        // Save the content as a file
+        // Save the content as a file with appropriate extension
         saveButton.addEventListener('click', () => {
+            const mode = languageSelector.value;
+            let extension = '';
+            switch(mode) {
+                case 'python':
+                    extension = '.py';
+                    break;
+                case 'lua':
+                    extension = '.lua';
+                    break;
+                case 'javascript':
+                    extension = '.js';
+                    break;
+            }
             const blob = new Blob([codeMirrorEditor.getValue()], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'code.txt';
+            a.download = `code${extension}`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
