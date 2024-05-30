@@ -21,11 +21,15 @@
             justify-content: space-between;
             align-items: center;
             padding: 10px;
-            background-color: #2d2d2d;
+            background: rgba(45, 45, 45, 0.75);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.18);
         }
         #editor-container {
             display: flex;
-            height: calc(100% - 40px);
+            height: calc(100% - 60px); /* Adjust height for top bar */
         }
         .CodeMirror {
             flex-grow: 1;
@@ -39,22 +43,40 @@
             color: #ffffff;
             border: none;
             padding: 5px;
-            margin: 10px;
+            margin: 0 10px;
         }
         button:hover {
             cursor: pointer;
+            background-color: #444444;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        label {
+            background-color: #2d2d2d;
+            color: #ffffff;
+            border: none;
+            padding: 5px;
+            margin: 0 10px;
+            cursor: pointer;
+        }
+        label:hover {
             background-color: #444444;
         }
     </style>
 </head>
 <body>
     <div id="top-bar">
-        <select id="language-selector">
-            <option value="python">Python</option>
-            <option value="lua">Lua</option>
-            <option value="javascript">JavaScript</option>
-        </select>
-        <button id="save-button">Save As File</button>
+        <div>
+            <select id="language-selector">
+                <option value="python">Python</option>
+                <option value="lua">Lua</option>
+                <option value="javascript">JavaScript</option>
+            </select>
+            <button id="save-button">Save As File</button>
+            <label for="open-file">Open File</label>
+            <input type="file" id="open-file" />
+        </div>
     </div>
     <div id="editor-container">
         <textarea id="editor">!language = 'lua'\n</textarea>
@@ -67,6 +89,7 @@
         const editorElement = document.getElementById('editor');
         const languageSelector = document.getElementById('language-selector');
         const saveButton = document.getElementById('save-button');
+        const openFileInput = document.getElementById('open-file');
 
         const codeMirrorEditor = CodeMirror.fromTextArea(editorElement, {
             lineNumbers: true,
@@ -107,6 +130,19 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+        });
+
+        // Open file and load its content into the editor
+        openFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const content = e.target.result;
+                    codeMirrorEditor.setValue(content);
+                };
+                reader.readAsText(file);
+            }
         });
     </script>
 </body>
