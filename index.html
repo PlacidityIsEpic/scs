@@ -63,43 +63,6 @@
         label:hover {
             background-color: #444444;
         }
-        #sidebar {
-            width: 200px;
-            background-color: #333333;
-            height: 100%;
-            overflow-y: auto;
-            padding-top: 20px;
-            box-sizing: border-box;
-        }
-        .folder {
-            color: #ffffff;
-            padding: 8px 16px;
-            cursor: pointer;
-        }
-        .folder:hover {
-            background-color: #444444;
-        }
-        .folder.active {
-            background-color: #555555;
-        }
-        #preview-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.75);
-            display: none;
-            justify-content: center;
-            align-items: center;
-        }
-        #preview {
-            width: 80%;
-            height: 80%;
-            background-color: #ffffff;
-            border-radius: 10px;
-            overflow: hidden;
-        }
     </style>
 </head>
 <body>
@@ -114,22 +77,73 @@
             <label for="open-file">Open File</label>
             <input type="file" id="open-file" />
         </div>
-        <button id="live-preview-button">Live Preview</button>
-    </div>
-    <div id="sidebar">
-        <div class="folder">Project Folder 1</div>
-        <div class="folder">Project Folder 2</div>
-        <div class="folder active">Project Folder 3</div>
     </div>
     <div id="editor-container">
-        <!-- This is the code editor -->
         <textarea id="editor">!language = 'lua'\n</textarea>
-    </div>
-    <div id="preview-container">
-        <!-- This is the live preview iframe -->
-        <iframe id="preview"></iframe>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/lua/lua.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+    <script>
+        const editorElement = document.getElementById('editor');
+        const languageSelector = document.getElementById('language-selector');
+        const saveButton = document.getElementById('save-button');
+        const openFileInput = document.getElementById('open-file');
+
+        const codeMirrorEditor = CodeMirror.fromTextArea(editorElement, {
+            lineNumbers: true,
+            theme: 'dracula',
+            mode: 'lua'
+        });
+
+        languageSelector.addEventListener('change', () => {
+            const mode = languageSelector.value;
+            codeMirrorEditor.setOption('mode', mode);
+            codeMirrorEditor.setValue(`!language = '${mode}'\n` + codeMirrorEditor.getValue().split('\n').slice(1).join('\n'));
+        });
+
+        // Set initial mode
+        codeMirrorEditor.setOption('mode', 'lua');
+
+        // Save the content as a file with appropriate extension
+        saveButton.addEventListener('click', () => {
+            const mode = languageSelector.value;
+            let extension = '';
+            switch(mode) {
+                case 'python':
+                    extension = '.py';
+                    break;
+                case 'lua':
+                    extension = '.lua';
+                    break;
+                case 'javascript':
+                    extension = '.js';
+                    break;
+            }
+            const blob = new Blob([codeMirrorEditor.getValue()], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `code${extension}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        // Open file and load its content into the editor
+        openFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const content = e.target.result;
+                    codeMirrorEditor.setValue(content);
+                };
+                reader.readAsText(file);
+            }
+        });
+    </script>
+</body>
+</html>
