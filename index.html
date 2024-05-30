@@ -1,16 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Document</title>
-   <link href="style.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skibby Code Studio</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: #1e1e1e;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        #editor-container {
+            display: flex;
+            height: 100%;
+        }
+        #line-counter {
+            background-color: #2d2d2d;
+            padding: 10px;
+            box-sizing: border-box;
+            color: #888888;
+        }
+        #editor {
+            flex-grow: 1;
+            padding: 10px;
+            box-sizing: border-box;
+            border: none;
+            background-color: #1e1e1e;
+            color: #ffffff;
+            resize: none;
+            outline: none;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        select {
+            background-color: #2d2d2d;
+            color: #ffffff;
+            border: none;
+            padding: 5px;
+            margin: 10px;
+        }
+    </style>
 </head>
 <body>
-   <scs-main>
-     <div style="text-align:center;">
-       <textarea id="area">print('Hello World!')</textarea>
-     </div>
-   </scs-main>
+    <select id="language-selector">
+        <option value="python">Python</option>
+        <option value="lua">Lua</option>
+        <option value="javascript">JavaScript</option>
+    </select>
+    <div id="editor-container">
+        <div id="line-counter"></div>
+        <textarea id="editor">!language = 'lua'\n</textarea>
+    </div>
+    <script>
+        const editor = document.getElementById('editor');
+        const lineCounter = document.getElementById('line-counter');
+        const languageSelector = document.getElementById('language-selector');
+
+        function updateLineCounter() {
+            const lines = editor.value.split('\n').length;
+            lineCounter.innerHTML = Array.from({length: lines}, (_, i) => i + 1).join('<br>');
+        }
+
+        editor.addEventListener('input', updateLineCounter);
+        languageSelector.addEventListener('change', () => {
+            editor.value = `!language = '${languageSelector.value}'\n` + editor.value.split('\n').slice(1).join('\n');
+            updateLineCounter();
+        });
+
+        // Initialize line counter
+        updateLineCounter();
+    </script>
 </body>
 </html>
