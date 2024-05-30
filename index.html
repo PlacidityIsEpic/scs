@@ -16,38 +16,46 @@
             font-family: Arial, sans-serif;
             overflow: hidden;
         }
+        #top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #2d2d2d;
+        }
         #editor-container {
             display: flex;
             height: calc(100% - 40px);
-        }
-        #line-counter {
-            background-color: #2d2d2d;
-            padding: 10px;
-            box-sizing: border-box;
-            color: #888888;
         }
         .CodeMirror {
             flex-grow: 1;
             height: 100%;
             box-sizing: border-box;
-            font-size: 16px;
+            font-size: 18px;
             line-height: 1.5;
         }
-        select {
+        select, button {
             background-color: #2d2d2d;
             color: #ffffff;
             border: none;
             padding: 5px;
             margin: 10px;
         }
+        button:hover {
+            cursor: pointer;
+            background-color: #444444;
+        }
     </style>
 </head>
 <body>
-    <select id="language-selector">
-        <option value="python">Python</option>
-        <option value="lua">Lua</option>
-        <option value="javascript">JavaScript</option>
-    </select>
+    <div id="top-bar">
+        <select id="language-selector">
+            <option value="python">Python</option>
+            <option value="lua">Lua</option>
+            <option value="javascript">JavaScript</option>
+        </select>
+        <button id="save-button">Save As File</button>
+    </div>
     <div id="editor-container">
         <textarea id="editor">!language = 'lua'\n</textarea>
     </div>
@@ -58,6 +66,7 @@
     <script>
         const editorElement = document.getElementById('editor');
         const languageSelector = document.getElementById('language-selector');
+        const saveButton = document.getElementById('save-button');
 
         const codeMirrorEditor = CodeMirror.fromTextArea(editorElement, {
             lineNumbers: true,
@@ -73,6 +82,19 @@
 
         // Set initial mode
         codeMirrorEditor.setOption('mode', 'lua');
+
+        // Save the content as a file
+        saveButton.addEventListener('click', () => {
+            const blob = new Blob([codeMirrorEditor.getValue()], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'code.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
     </script>
 </body>
 </html>
